@@ -2,6 +2,7 @@ import sqlite3
 from typing import Tuple
 import subprocess
 import os
+from datetime import datetime
 
 type ConfigType = Tuple[int, str, int, int]
 
@@ -22,12 +23,13 @@ def main():
         print("[1] Add a new configuration")
         print("[2] Select configuration")
         print("[3] Reset screen size")
-        print("[4] Exit")
+        print("[4] Screenshot")
+        print("[5] Exit")
         try:
-            option: int = read_int("> ", 1, 4)
+            option: int = read_int("> ", 1, 5)
         except KeyboardInterrupt:
             print()
-            option = 4
+            option = 5
 
         match option:
             case 1:
@@ -86,6 +88,24 @@ def main():
                     ]
                 )
             case 4:
+                os.makedirs(os.path.dirname("./screenshots/"), exist_ok=True)
+                now = datetime.now()
+                filename = now.strftime("%Y-%m-%d_%H:%M:%S:%f")
+                screenshot = subprocess.run(
+                    [
+                        "adb",
+                        "exec-out",
+                        "screencap",
+                        "-p",
+                    ],
+                    capture_output=True,
+                )
+                if screenshot.returncode == 0:
+                    with open(f"screenshots/{filename}.png", "wb") as f:
+                        f.write(screenshot.stdout)
+                else:
+                    print(screenshot.stderr.decode().strip())
+            case 5:
                 done = True
                 print("Have a great day!")
 
