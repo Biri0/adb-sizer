@@ -3,7 +3,7 @@ from typing import Tuple
 import subprocess
 import os
 
-type ConfigType = Tuple[str, int, int]
+type ConfigType = Tuple[int, str, int, int]
 
 
 def main():
@@ -13,7 +13,9 @@ def main():
     con: sqlite3.Connection = sqlite3.connect(db_path)
     cur: sqlite3.Cursor = con.cursor()
 
-    cur.execute("CREATE TABLE IF NOT EXISTS config(name, width, height)")
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS config(id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, width INTEGER, height INTEGER)"
+    )
 
     done: bool = False
     while not done:
@@ -39,7 +41,8 @@ def main():
                     )
 
                     cur.execute(
-                        "INSERT INTO config VALUES(?, ?, ?)", (name, width, height)
+                        "INSERT INTO config(name, width, height) VALUES(?, ?, ?)",
+                        (name, width, height),
                     )
                     con.commit()
                 except KeyboardInterrupt:
@@ -54,7 +57,7 @@ def main():
                         print("You must create a configuration before applying it.")
                     else:
                         for i, config in enumerate(configs):
-                            print(f"[{i}] {config[0]} ({config[1]}x{config[2]})")
+                            print(f"[{i}] {config[1]} ({config[2]}x{config[3]})")
                         print(f"[{len_configs}] Nevermind")
 
                         option = read_int("> ", 0, len_configs)
@@ -66,7 +69,7 @@ def main():
                                     "shell",
                                     "wm",
                                     "size",
-                                    f"{config[1]}x{config[2]}",
+                                    f"{config[2]}x{config[3]}",
                                 ]
                             )
                 except KeyboardInterrupt:
