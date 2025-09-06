@@ -21,12 +21,13 @@ def main():
     while not done:
         print("[1] Add a new configuration")
         print("[2] Select configuration")
-        print("[3] Exit")
+        print("[3] Reset screen size")
+        print("[4] Exit")
         try:
-            option: int = read_int("> ", 1, 3)
+            option: int = read_int("> ", 1, 4)
         except KeyboardInterrupt:
             print()
-            option = 3
+            option = 4
 
         match option:
             case 1:
@@ -75,6 +76,16 @@ def main():
                 except KeyboardInterrupt:
                     print()
             case 3:
+                subprocess.run(
+                    [
+                        "adb",
+                        "shell",
+                        "wm",
+                        "size",
+                        "reset",
+                    ]
+                )
+            case 4:
                 done = True
                 print("Have a great day!")
 
